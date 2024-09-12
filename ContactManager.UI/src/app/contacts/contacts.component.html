@@ -1,1 +1,28 @@
-<p>contacts works!</p>
+<div class="container">
+  <table class="custom-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Date of Birth</th>
+        <th>Married</th>
+        <th>Phone</th>
+        <th>Salary</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (contact of contacts(); track contact.id){
+      <tr>
+        <td>{{ contact.name }}</td>
+        <td>{{ contact.birthDate | date : "yyyy-MM-dd" }}</td>
+        @if (contact.married === true){
+        <td>Yes</td>
+        }@else {
+        <td>No</td>
+        }
+        <td>+{{ contact.phone }}</td>
+        <td>{{ contact.salary | currency }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
