@@ -5,5 +5,6 @@ namespace ContactManager.Domain.Repositories
     public interface IContactsRepository
     {
         Task AddContacts(IEnumerable<Contact> contacts);
+        Task<IEnumerable<Contact>> GetAllContacts();
     }
 }

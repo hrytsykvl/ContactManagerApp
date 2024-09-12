@@ -9,5 +9,11 @@ namespace ContactManager.Application.Contacts
         {
             await contactsRepository.AddContacts(contacts);
         }
+
+        public async Task<IEnumerable<Contact>> GetContacts()
+        {
+            var contacts = await contactsRepository.GetAllContacts();
+            return contacts;
+        }
     }
 }
