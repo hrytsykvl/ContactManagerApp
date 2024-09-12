@@ -29,20 +29,23 @@ namespace ContactManager.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllContacts()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Contact>>> GetAllContacts()
         {
             var contacts = await mediator.Send(new GetAllContactsQuery());
             return Ok(contacts);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetContactById([FromRoute]int id)
+        public async Task<ActionResult<Contact?>> GetContactById([FromRoute]int id)
         {
             var contact = await mediator.Send(new GetContactByIdQuery(id));
             return Ok(contact);
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteContact([FromRoute]int id)
         {
             var isDeleted = await mediator.Send(new DeleteContactCommand(id));
@@ -55,6 +58,8 @@ namespace ContactManager.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateContact([FromRoute]int id, UpdateContactCommand command)
         {
             command.Id = id;
