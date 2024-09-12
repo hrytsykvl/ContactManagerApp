@@ -1,7 +1,7 @@
 ﻿using ContactManager.Domain.Entities;
 using CsvHelper.Configuration;
 
-namespace ContactManager.Infrastructure.Csv
+namespace ContactManager.Application.Csv
 {
     public class ContactMap : ClassMap<Contact>
     {

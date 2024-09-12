@@ -1,83 +1,57 @@
-﻿using ContactManager.Application.Contacts;
+﻿using ContactManager.Application.Contacts.Commands.DeleteContact;
+using ContactManager.Application.Contacts.Commands.UploadCsv;
+using ContactManager.Application.Contacts.Queries.GetAllContacts;
+using ContactManager.Application.Contacts.Queries.GetContactById;
 using ContactManager.Domain.Entities;
-using ContactManager.Infrastructure.Csv;
-using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 
 namespace ContactManager.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ContactsController(IContactsService contactsService) : ControllerBase
+    public class ContactsController(IMediator mediator) : ControllerBase
     {
         [HttpPost]
         public async Task<IActionResult> UploadCsv(IFormFile file)
         {
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest("No file uploaded.");
+                var command = new UploadCsvCommand { File = file };
+                await mediator.Send(command);
+                return Ok("CSV file processed successfully.");
             }
-
-            using (var streamReader = new StreamReader(file.OpenReadStream()))
-            using (var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.InvariantCulture)))
+            catch (Exception ex)
             {
-                var contacts = new List<Contact>();
-                var validationErrors = new List<string>();
-
-                try
-                {
-                    csvReader.Context.RegisterClassMap<ContactMap>();
-                    contacts = csvReader.GetRecords<Contact>().ToList();
-                }
-                catch (HeaderValidationException)
-                {
-                    return BadRequest("CSV file has invalid headers. Please ensure the CSV contains the correct fields.");
-                }
-                catch (TypeConverterException)
-                {
-                    return BadRequest("CSV file contains invalid data types. Please ensure the data is properly formatted.");
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, $"An error occurred while processing the file: {ex.Message}");
-                }
-
-                foreach (var contact in contacts)
-                {
-                    var validationContext = new ValidationContext(contact);
-                    var results = new List<ValidationResult>();
-
-                    if (!Validator.TryValidateObject(contact, validationContext, results, true))
-                    {
-                        foreach (var error in results)
-                        {
-                            validationErrors.Add(error.ErrorMessage);
-                        }
-                    }
-                }
-
-                if (validationErrors.Any())
-                {
-                    return BadRequest(new { Errors = validationErrors });
-                }
-
-                await contactsService.AddContacts(contacts);
-
-                return Ok("File uploaded and data saved successfully.");
+                return BadRequest(ex.Message);
             }
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllContacts()
         {
-            var contacts = await contactsService.GetContacts();
+            var contacts = await mediator.Send(new GetAllContactsQuery());
             return Ok(contacts);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetContactById([FromRoute]int id)
+        {
+            var contact = await mediator.Send(new GetContactByIdQuery(id));
+            return Ok(contact);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteContact([FromRoute]int id)
+        {
+            var command = new DeleteContactCommand(id);
+            var isDeleted = await mediator.Send(command);
+
+            if(isDeleted)
+            {
+                return NoContent();
+            }
+            return NotFound();
+        }
     }
 }

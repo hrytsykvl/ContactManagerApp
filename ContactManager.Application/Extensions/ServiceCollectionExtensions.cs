@@ -7,7 +7,9 @@ namespace ContactManager.Application.Extensions
     {
         public static void AddApplication(this IServiceCollection services)
         {
-            services.AddScoped<IContactsService, ContactsService>();
+            var applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
+
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
         }
     }
 }

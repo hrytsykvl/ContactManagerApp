@@ -13,10 +13,22 @@ namespace ContactManager.Infrastructure.Repositories
             await dbContext.SaveChangesAsync();
         }
 
+        public async Task DeleteContact(Contact contact)
+        {
+            dbContext.Contacts.Remove(contact);
+            await dbContext.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Contact>> GetAllContacts()
         {
             var contacts = await dbContext.Contacts.ToListAsync();
             return contacts;
+        }
+
+        public async Task<Contact?> GetContactById(int id)
+        {
+            var contact = await dbContext.Contacts.FindAsync(id);
+            return contact;
         }
     }
 }
