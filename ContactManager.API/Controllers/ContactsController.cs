@@ -2,9 +2,11 @@
 using ContactManager.Domain.Entities;
 using ContactManager.Infrastructure.Csv;
 using CsvHelper;
+using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 
 namespace ContactManager.API.Controllers
@@ -22,9 +24,10 @@ namespace ContactManager.API.Controllers
             }
 
             using (var streamReader = new StreamReader(file.OpenReadStream()))
-            using (var csvReader = new CsvReader(streamReader, CultureInfo.InvariantCulture))
+            using (var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.InvariantCulture)))
             {
                 var contacts = new List<Contact>();
+                var validationErrors = new List<string>();
 
                 try
                 {
@@ -44,16 +47,23 @@ namespace ContactManager.API.Controllers
                     return StatusCode(500, $"An error occurred while processing the file: {ex.Message}");
                 }
 
-                var validationErrors = contacts
-                    .Where(c => string.IsNullOrEmpty(c.Name) ||
-                                string.IsNullOrEmpty(c.Phone) ||
-                                c.Salary <= 0 ||
-                                c.BirthDate == DateOnly.MinValue)
-                    .ToList();
+                foreach (var contact in contacts)
+                {
+                    var validationContext = new ValidationContext(contact);
+                    var results = new List<ValidationResult>();
+
+                    if (!Validator.TryValidateObject(contact, validationContext, results, true))
+                    {
+                        foreach (var error in results)
+                        {
+                            validationErrors.Add(error.ErrorMessage);
+                        }
+                    }
+                }
 
                 if (validationErrors.Any())
                 {
-                    return BadRequest("Some records contain invalid or missing data.");
+                    return BadRequest(new { Errors = validationErrors });
                 }
 
                 await contactsService.AddContacts(contacts);
