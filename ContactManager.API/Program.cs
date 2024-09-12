@@ -1,6 +1,7 @@
 using ContactManager.Infrastructure.Extensions;
 using ContactManager.Infrastructure.Seeders;
 using ContactManager.Application.Extensions;
+using ContactManager.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -19,6 +22,7 @@ var seeder = scope.ServiceProvider.GetRequiredService<IContactSeeder>();
 
 await seeder.Seed();
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if(app.Environment.IsDevelopment())
 {

@@ -3,10 +3,8 @@ using ContactManager.Domain.Entities;
 using ContactManager.Domain.Repositories;
 using CsvHelper;
 using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
-using System.Formats.Asn1;
 using System.Globalization;
 
 namespace ContactManager.Application.Contacts.Commands.UploadCsv
@@ -26,23 +24,9 @@ namespace ContactManager.Application.Contacts.Commands.UploadCsv
                 var contacts = new List<Contact>();
                 var validationErrors = new List<string>();
 
-                try
-                {
-                    csvReader.Context.RegisterClassMap<ContactMap>();
-                    contacts = csvReader.GetRecords<Contact>().ToList();
-                }
-                catch (HeaderValidationException)
-                {
-                    throw new Exception("CSV file has invalid headers. Please ensure the CSV contains the correct fields.");
-                }
-                catch (TypeConverterException)
-                {
-                    throw new Exception("CSV file contains invalid data types. Please ensure the data is properly formatted.");
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"An error occurred while processing the file: {ex.Message}");
-                }
+                
+                csvReader.Context.RegisterClassMap<ContactMap>();
+                contacts = csvReader.GetRecords<Contact>().ToList();
 
                 foreach (var contact in contacts)
                 {

@@ -16,16 +16,9 @@ namespace ContactManager.API.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadCsv(IFormFile file)
         {
-            try
-            {
-                var command = new UploadCsvCommand { File = file };
-                await mediator.Send(command);
-                return Ok("CSV file processed successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var command = new UploadCsvCommand { File = file };
+            await mediator.Send(command);
+            return Ok("CSV file processed successfully.");
         }
 
         [HttpGet]
