@@ -1,4 +1,6 @@
 ﻿using ContactManager.Application.Contacts;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ContactManager.Application.Extensions
@@ -10,6 +12,9 @@ namespace ContactManager.Application.Extensions
             var applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
+
+            services.AddValidatorsFromAssembly(applicationAssembly)
+                .AddFluentValidationAutoValidation();
         }
     }
 }

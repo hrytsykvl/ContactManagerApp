@@ -8,5 +8,6 @@ namespace ContactManager.Domain.Repositories
         Task<IEnumerable<Contact>> GetAllContacts();
         Task<Contact?> GetContactById(int id);
         Task DeleteContact(Contact contact);
+        Task SaveChanges();
     }
 }

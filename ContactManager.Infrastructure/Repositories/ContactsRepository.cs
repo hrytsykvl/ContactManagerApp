@@ -30,5 +30,7 @@ namespace ContactManager.Infrastructure.Repositories
             var contact = await dbContext.Contacts.FindAsync(id);
             return contact;
         }
+
+        public Task SaveChanges() => dbContext.SaveChangesAsync();
     }
 }

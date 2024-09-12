@@ -1,4 +1,5 @@
 ﻿using ContactManager.Application.Contacts.Commands.DeleteContact;
+using ContactManager.Application.Contacts.Commands.UpdateContact;
 using ContactManager.Application.Contacts.Commands.UploadCsv;
 using ContactManager.Application.Contacts.Queries.GetAllContacts;
 using ContactManager.Application.Contacts.Queries.GetContactById;
@@ -44,10 +45,22 @@ namespace ContactManager.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContact([FromRoute]int id)
         {
-            var command = new DeleteContactCommand(id);
-            var isDeleted = await mediator.Send(command);
+            var isDeleted = await mediator.Send(new DeleteContactCommand(id));
 
             if(isDeleted)
+            {
+                return NoContent();
+            }
+            return NotFound();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateContact([FromRoute]int id, UpdateContactCommand command)
+        {
+            command.Id = id;
+            var isUpdated = await mediator.Send(command);
+
+            if (isUpdated)
             {
                 return NoContent();
             }
