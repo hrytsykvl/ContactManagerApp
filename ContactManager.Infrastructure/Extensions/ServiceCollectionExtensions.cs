@@ -1,4 +1,6 @@
-﻿using ContactManager.Infrastructure.Persistence;
+﻿using ContactManager.Domain.Repositories;
+using ContactManager.Infrastructure.Persistence;
+using ContactManager.Infrastructure.Repositories;
 using ContactManager.Infrastructure.Seeders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +16,7 @@ namespace ContactManager.Infrastructure.Extensions
             services.AddDbContext<ContactsDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddScoped<IContactSeeder, ContactSeeder>();
+            services.AddScoped<IContactsRepository, ContactsRepository>();
         }
     }
 }
