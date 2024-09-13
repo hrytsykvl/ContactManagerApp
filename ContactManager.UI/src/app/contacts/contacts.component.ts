@@ -25,6 +25,7 @@ export class ContactsComponent {
   currentSortColumn: string | null = null;
   isSortAscending: boolean = true;
   editForm: FormGroup;
+  csvFile: File | null = null;
 
   constructor(
     private contactsService: ContactsService,
@@ -101,6 +102,24 @@ export class ContactsComponent {
   onColumnSelect(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.selectedColumn = target.value;
+  }
+
+  onFileChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.item(0);
+    if (file) {
+      this.csvFile = file;
+    }
+  }
+
+  uploadCsv(): void {
+    if (this.csvFile) {
+      this.contactsService.uploadCsv(this.csvFile).subscribe(() => {
+        this.loadContacts();
+        this.csvFile = null;
+      });
+    }
+    console.log(this.csvFile);
   }
 
   onFilterChange(event: Event): void {

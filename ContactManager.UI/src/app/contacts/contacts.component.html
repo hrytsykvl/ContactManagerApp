@@ -1,20 +1,35 @@
 <div class="container">
-  <div class="filter-container">
-    <label for="filter-column">Filter by:</label>
-    <select id="filter-column" (change)="onColumnSelect($event)">
-      <option value="name">Name</option>
-      <option value="birthDate">Date of Birth</option>
-      <option value="married">Married</option>
-      <option value="phone">Phone</option>
-      <option value="salary">Salary</option>
-    </select>
+  <div class="flex-container">
+    <div class="filter-container">
+      <label for="filter-column">Filter by:</label>
+      <select id="filter-column" (change)="onColumnSelect($event)">
+        <option value="name">Name</option>
+        <option value="birthDate">Date of Birth</option>
+        <option value="married">Married</option>
+        <option value="phone">Phone</option>
+        <option value="salary">Salary</option>
+      </select>
 
-    <input
-      type="text"
-      placeholder="Enter search term"
-      (input)="onFilterChange($event)"
-    />
+      <input
+        type="text"
+        placeholder="Enter search term"
+        (input)="onFilterChange($event)"
+      />
+    </div>
+    <div class="flex-1">
+      <div class="flex-2">
+        <label for="upload-csv">Upload CSV</label>
+        <input
+          type="file"
+          id="upload-csv"
+          (change)="onFileChange($event)"
+          accept=".csv"
+        />
+      </div>
+      <button (click)="uploadCsv()">Upload</button>
+    </div>
   </div>
+
   <table class="custom-table">
     <thead>
       <tr class="sort-column">
