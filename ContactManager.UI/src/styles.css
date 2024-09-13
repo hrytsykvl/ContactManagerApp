@@ -53,3 +53,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.sort-column th {
+  cursor: pointer;
+}

@@ -1,28 +1,105 @@
 <div class="container">
+  <div class="filter-container">
+    <label for="filter-column">Filter by:</label>
+    <select id="filter-column" (change)="onColumnSelect($event)">
+      <option value="name">Name</option>
+      <option value="birthDate">Date of Birth</option>
+      <option value="married">Married</option>
+      <option value="phone">Phone</option>
+      <option value="salary">Salary</option>
+    </select>
+
+    <input
+      type="text"
+      placeholder="Enter search term"
+      (input)="onFilterChange($event)"
+    />
+  </div>
   <table class="custom-table">
     <thead>
-      <tr>
-        <th>Name</th>
-        <th>Date of Birth</th>
-        <th>Married</th>
-        <th>Phone</th>
-        <th>Salary</th>
+      <tr class="sort-column">
+        <th (click)="sortData('name')">Name</th>
+        <th (click)="sortData('birthDate')">Date of Birth</th>
+        <th (click)="sortData('married')">Married</th>
+        <th (click)="sortData('phone')">Phone</th>
+        <th (click)="sortData('salary')">Salary</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      @for (contact of contacts(); track contact.id){
-      <tr>
-        <td>{{ contact.name }}</td>
-        <td>{{ contact.birthDate | date : "yyyy-MM-dd" }}</td>
-        @if (contact.married === true){
-        <td>Yes</td>
-        }@else {
-        <td>No</td>
-        }
-        <td>+{{ contact.phone }}</td>
-        <td>{{ contact.salary | currency }}</td>
+      <tr *ngFor="let contact of filteredContacts">
+        <td>
+          <input
+            *ngIf="editingContact?.id === contact.id"
+            [formControl]="convertToFormControl(editForm.get('name'))"
+          />
+          <span *ngIf="editingContact?.id !== contact.id">{{
+            contact.name
+          }}</span>
+        </td>
+        <td>
+          <input
+            *ngIf="editingContact?.id === contact.id"
+            type="date"
+            [formControl]="convertToFormControl(editForm.get('birthDate'))"
+          />
+          <span *ngIf="editingContact?.id !== contact.id">{{
+            contact.birthDate | date : "yyyy-MM-dd"
+          }}</span>
+        </td>
+        <td>
+          <select
+            *ngIf="editingContact?.id === contact.id"
+            [formControl]="convertToFormControl(editForm.get('married'))"
+          >
+            <option [value]="true">Yes</option>
+            <option [value]="false">No</option>
+          </select>
+          <span *ngIf="editingContact?.id !== contact.id">{{
+            contact.married ? "Yes" : "No"
+          }}</span>
+        </td>
+        <td>
+          <input
+            *ngIf="editingContact?.id === contact.id"
+            [formControl]="convertToFormControl(editForm.get('phone'))"
+          />
+          <span *ngIf="editingContact?.id !== contact.id">{{
+            contact.phone
+          }}</span>
+        </td>
+        <td>
+          <input
+            *ngIf="editingContact?.id === contact.id"
+            type="number"
+            [formControl]="convertToFormControl(editForm.get('salary'))"
+          />
+          <span *ngIf="editingContact?.id !== contact.id">{{
+            contact.salary | currency
+          }}</span>
+        </td>
+        <td>
+          <button
+            *ngIf="editingContact?.id !== contact.id"
+            (click)="editContact(contact)"
+          >
+            Edit
+          </button>
+          <button
+            *ngIf="editingContact?.id === contact.id"
+            (click)="saveContact()"
+          >
+            Save
+          </button>
+          <button
+            *ngIf="editingContact?.id === contact.id"
+            (click)="cancelEdit()"
+          >
+            Cancel
+          </button>
+          <button (click)="deleteContact(contact.id)">Delete</button>
+        </td>
       </tr>
-      }
     </tbody>
   </table>
 </div>
